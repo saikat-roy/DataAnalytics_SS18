@@ -1,0 +1,124 @@
+---
+title: "Data Analytics Project"
+author: "Saikat Roy, Vijayesh Kumar Das, Pooja Bhatia"
+date: "28 July 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+require(pacman)
+p_load(tidyverse, data.table, stringr)
+
+```
+
+Changing directory and loading the 'Caracteristics' CSV file
+
+```{r}
+setwd("C:\\Users\\Saikat-PC\\Desktop\\accidents-in-france-from-2005-to-2016")
+data <- read.csv("caracteristics.csv", header = TRUE)
+colnames(data)
+
+#PLEASE NOTE THAT "users" and "places" dataset have been loaded later but not displayed
+```
+
+PLEASE NOTE: "users" and "places" dataset have been loaded later but not displayed
+
+```{r}
+#Structure of data frame
+colnames(data)
+str(data)
+```
+
+```{r}
+# Short glimpse of data set
+glimpse(data)
+```
+
+# Yearly Variations of Accidents over Months (1-12)
+```{r}
+sample = sample_n(data,100000)
+
+data %>% mutate(factorYear=as.factor(2000+an)) %>% 
+  group_by(factorYear, mois) %>% summarise(Count=n()) %>% 
+  ggplot(aes(x = mois, color=factorYear, y=Count))+ 
+  ggtitle("Yearly Variations of Accidents over Months")+
+  geom_line() + xlab("Months from 1-12") 
+```
+
+# Monthly Variations of Accidents over Years (2005-2016) 
+```{r}
+data %>% mutate(factorMonth=as.factor(mois)) %>% 
+  group_by(factorMonth, an) %>% summarise(Count=n()) %>% 
+  ggplot(aes(x = an+2000, color=factorMonth, y=Count))+ geom_line() + 
+  xlab("Years from 2005-2016")+
+  ggtitle("Monthly Variations of Accidents over Years")
+```
+
+# Hourly Distribution of Accidents
+```{r}
+data %>% mutate(years=as.factor(2000+an)) %>%
+  #group_by(factorYear, hrmn) %>% summarise(Count=n()) %>% 
+  ggplot(aes(x = hrmn, color=years))+ 
+  geom_histogram(bins=48)+ xlab("Hours in 24 hours format") + 
+  ggtitle("Hourly Distribution of Accidents")+
+  scale_x_continuous(breaks = seq(0, 2400, by = 300))+
+  ggtitle("Hourly Distribution of Accidents")
+
+```
+
+#Distribution of accidents by lighting conditions in which the accident occurred
+```{r}
+data %>% mutate(years=as.factor(2000+an)) %>%
+ggplot(aes(x = lum, color=years)) + ggtitle("Distribution of accidents by lighting conditions in which the accident occurred") +xlab("Lumination") + ylab("count")+geom_bar()+
+scale_x_continuous(breaks = 1:5,labels=c("Full day", "Twilight or dawn", "Night without public lighting","Night with public lighting not lit","Night with public lighting on"))+
+theme(axis.text.x = element_text(angle = 15))
+print(plot)
+
+```
+# Distribution of accidents by Category of road
+```{r}
+data1<-read.csv("places.csv", header = TRUE)
+data1$year<-data[match(data$Num_Acc , data1$Num_Acc), "an"]
+data1$catr<-as.factor(data1$catr)
+data1%>% filter(data1$catr!=0) %>% mutate(years=as.factor(2000+year)) %>%
+ggplot(aes(x =catr, color=years)) + ggtitle("Distribution of accidents by Category of road") +xlab("Category of road") + ylab("count")+geom_bar()+
+scale_x_discrete(breaks = c("1","2","3","4","5","6","9"),labels=c("Highway","NationalRoad","Departmental Road","Communal Way","Off public network","Off public network","other"))+
+theme(axis.text.x = element_text(angle = 15))
+```
+
+
+# Distribution of accidents by Atmospheric conditions
+
+```{r}
+data %>% mutate(years=as.factor(2000+an)) %>%
+ggplot(aes(x = atm, color=years)) + ggtitle("Distribution of accidents by Atmospheric conditions") +xlab("Atmospheric conditions") + ylab("count")+geom_bar()+
+scale_x_continuous(breaks = 1:9,labels=c("Normal","Light rain","Heavy rain","Snow - hail","Fog - smoke","Strong wind - storm","Dazzling weather","Cloudy weather","Other"))+
+theme(axis.text.x = element_text(angle = 15))
+```
+# Distribution of accidents by surface condition
+
+```{r}
+data1$surf<-as.factor(data1$surf)
+data1 %>% filter(data1$surf!=0) %>% mutate(years=as.factor(2000+year)) %>%
+ggplot(aes(x =surf, color=years)) + ggtitle("Distribution of accidents by surface condition") +
+  xlab("surface condition") + ylab("count")+geom_bar()+
+scale_x_discrete(breaks = c("1","2","3","4","5","6","7","8"),labels=c("normal"," wet","puddles","flooded","snow","mud","icy","fat-oil"))+
+theme(axis.text.x = element_text(angle = 15))
+```
+#Accidents according to the age
+```{r}
+users<-read.csv("users.csv", header = TRUE)
+
+users$accidentYear <- data[match(users$Num_Acc , data$Num_Acc), "an"] 
+users$age <- (as.integer(users$accidentYear)+2000) - users$an_nais
+
+ggplot(users, aes(x=age, fill = NULL))+
+  geom_area(stat = "bin")+
+  xlab("age")+
+  ylab("Total Count")+ggtitle("Distribution of Accidents over Ages")
+```
+
