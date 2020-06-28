@@ -1,8 +1,6 @@
 # Data Analytics and Visualization Project SS2018
 Final project from the Data Analytics and Visualization Project at the University of Bonn (SS 2018)
 
-Needless to say, the project has all the grace of a semester project. But it may be useful to someone looking to start with visualizations in R particularly.
-
 # Dataset
 The project uses the "ROAD ACCIDENTS IN FRANCE FROM 2005-2016" dataset from Kaggle. While I have not included the data set link here, it is available pretty easily by a simple Google search with the title.
 
